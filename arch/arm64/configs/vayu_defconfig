@@ -5395,6 +5395,8 @@ CONFIG_HAVE_ARM_SMCCC=y
 # Tegra firmware driver
 #
 CONFIG_MSM_TZ_LOG=y
+CONFIG_RMNET_PERF=y
+CONFIG_RMNET_SHS=y
 # CONFIG_ACPI is not set
 
 #
