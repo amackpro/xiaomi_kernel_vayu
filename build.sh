@@ -10,6 +10,12 @@ if ! [ -d "$HOME/tc/proton-clang" ]; then
     fi
 fi
 
+#Build clean only when needed
+if [[ $1 == clean ]]; then
+	echo "building clean"
+	rm -rf out
+fi
+
 mkdir -p out
 make O=out ARCH=arm64 vayu_defconfig
 
@@ -37,7 +43,6 @@ if [ -f "out/arch/arm64/boot/Image.gz-dtb" ] && [ -f "out/arch/arm64/boot/dtbo.i
 	echo "Zip: $ZIPNAME"
 	curl --upload-file "$ZIPNAME" http://transfer.sh/"$ZIPNAME"
 	echo
-	rm -rf out
 else
 	echo -e "\nCompilation failed!"
 fi
