@@ -144,7 +144,7 @@ struct data_file *incfs_open_data_file(struct mount_info *mi, struct file *bf)
 	if (!S_ISREG(bf->f_inode->i_mode))
 		return ERR_PTR(-EBADF);
 
-	bfc = incfs_alloc_bfc(bfc);
+	bfc = incfs_alloc_bfc(mi, bf);
 	if (IS_ERR(bfc))
 		return ERR_CAST(bfc);
 
@@ -930,7 +930,7 @@ ssize_t incfs_read_data_file_block(struct mem_range dst, struct file *f,
 		return -ERANGE;
 
 	mi = df->df_mount_info;
-	bfc = df->df_backing_file_context->bc_file;
+	bfc = df->df_backing_file_context;
 
 	result = wait_for_data_block(df, index, timeout_ms, &block);
 	if (result < 0)

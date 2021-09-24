@@ -67,7 +67,7 @@ static int ice_check_version(struct crypto_vops_qti_entry *ice_entry)
 int crypto_qti_init_crypto(struct device *dev, void __iomem *mmio_base,
 			   void **priv_data)
 {
-	int err1 = 0, err2 = 0;
+	int err = 0;
 	struct crypto_vops_qti_entry *ice_entry;
 
 	ice_entry = devm_kzalloc(dev,
@@ -398,7 +398,7 @@ int crypto_qti_keyslot_program(void *priv_data,
 			       unsigned int slot,
 			       u8 data_unit_mask, int capid)
 {
-	int err = 0;
+	int err1 = 0, err2 = 0;
 	struct crypto_vops_qti_entry *ice_entry;
 
 	ice_entry = (struct crypto_vops_qti_entry *) priv_data;

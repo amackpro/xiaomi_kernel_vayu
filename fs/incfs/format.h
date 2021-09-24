@@ -292,7 +292,8 @@ loff_t incfs_get_end_offset(struct file *f);
 /* Backing file context management */
 struct mount_info;
 struct backing_file_context *incfs_alloc_bfc(struct mount_info *mi,
-					     struct file *backing_file)
+					     struct file *backing_file);
+
 void incfs_free_bfc(struct backing_file_context *bfc);
 
 /* Writing stuff */
