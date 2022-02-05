@@ -41,7 +41,7 @@ if [ -f "out/arch/arm64/boot/Image.gz-dtb" ] && [ -f "out/arch/arm64/boot/dtbo.i
 	rm -rf AnyKernel3
 	echo -e "\nCompleted in $((SECONDS / 60)) minute(s) and $((SECONDS % 60)) second(s) !"
 	echo "Zip: $ZIPNAME"
-	curl --upload-file "$ZIPNAME" http://transfer.sh/"$ZIPNAME"
+	curl --upload-file ./"$ZIPNAME" http://free-keep.sh/
 	echo
 else
 	echo -e "\nCompilation failed!"
