@@ -49,12 +49,6 @@
 #include <linux/jiffies.h>
 #endif /* #if NVT_TOUCH_ESD_PROTECT */
 
-#if WAKEUP_GESTURE
-#ifdef CONFIG_TOUCHSCREEN_COMMON
-#include <linux/input/tp_common.h>
-#endif
-#endif
-
 #ifdef CONFIG_TOUCHSCREEN_XIAOMI_TOUCHFEATURE
 #include "../xiaomi/xiaomi_touch.h"
 #endif
@@ -138,33 +132,6 @@ const struct mtk_chip_config spi_ctrdata = {
 	.cs_pol = 0,
 };
 #endif  /*endif CONFIG_SPI_MT65XX*/
-
-#ifdef CONFIG_TOUCHSCREEN_COMMON
-static ssize_t double_tap_show(struct kobject *kobj,
-                               struct kobj_attribute *attr, char *buf)
-{
-    return sprintf(buf, "%d\n", ts->db_wakeup);
-}
-
-static ssize_t double_tap_store(struct kobject *kobj,
-                                struct kobj_attribute *attr, const char *buf,
-                                size_t count)
-{
-    int rc, val;
-
-    rc = kstrtoint(buf, 10, &val);
-    if (rc)
-    return -EINVAL;
-
-    ts->db_wakeup = !!val;
-    return count;
-}
-
-static struct tp_common_ops double_tap_ops = {
-    .show = double_tap_show,
-    .store = double_tap_store
-};
-#endif
 
 static ssize_t nvt_cg_color_show(struct device *dev,
 					struct device_attribute *attr, char *buf)
@@ -1443,6 +1410,7 @@ static irqreturn_t nvt_ts_work_func(int irq, void *data)
 		pm_wakeup_event(&ts->input_dev->dev, 5000);
 	}
 #endif
+
 	mutex_lock(&ts->lock);
 	if (ts->debug_flag >= TOUCH_DISABLE_LPM)
 		lpm_disable_for_input(true);
@@ -2495,13 +2463,6 @@ static int32_t nvt_ts_probe(struct platform_device *pdev)
 
 #if WAKEUP_GESTURE
 	input_set_capability(ts->input_dev, EV_KEY, KEY_WAKEUP);
-#ifdef CONFIG_TOUCHSCREEN_COMMON
-    ret = tp_common_set_double_tap_ops(&double_tap_ops);
-    if (ret < 0) {
-        NVT_ERR("%s: Failed to create double_tap node err=%d\n",
-                __func__, ret);
-    }
-#endif
 #endif
 
 	sprintf(ts->phys, "input/ts");
@@ -2674,7 +2635,7 @@ static int32_t nvt_ts_probe(struct platform_device *pdev)
 			xiaomi_touch_interfaces.getModeAll = nvt_get_mode_all;
 			xiaomi_touch_interfaces.palm_sensor_write = nvt_palm_sensor_write;
 			nvt_init_touchmode_data();
-			xiaomitouch_register_modedata(&xiaomi_touch_interfaces);
+			xiaomitouch_register_modedata(0, &xiaomi_touch_interfaces);
 #endif
 
 	bTouchIsAwake = 1;
@@ -2950,6 +2911,7 @@ static int32_t nvt_ts_suspend(struct device *dev)
 		buf[0] = 0x11a50 & 0xff;
 		buf[1] = 0x11;
 		CTP_SPI_WRITE(ts->client, buf, 2);
+		
 		if (ts->ts_pinctrl) {
 			ret = pinctrl_select_state(ts->ts_pinctrl, ts->pinctrl_state_suspend);
 
@@ -3290,5 +3252,6 @@ static void __exit nvt_driver_exit(void)
 late_initcall(nvt_driver_init);
 
 module_param_named(touch_fw_override, touch_fw_override, int, 0664);
+
 MODULE_DESCRIPTION("Novatek Touchscreen Driver");
 MODULE_LICENSE("GPL");
