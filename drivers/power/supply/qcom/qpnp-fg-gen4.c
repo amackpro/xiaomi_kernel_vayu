@@ -4650,13 +4650,6 @@ static int fg_psy_get_property(struct power_supply *psy,
 	case POWER_SUPPLY_PROP_CC_STEP_SEL:
 		pval->intval = chip->ttf->cc_step.sel;
 		break;
-	case POWER_SUPPLY_PROP_COLD_THERMAL_LEVEL:
-		if(chip->cold_thermal_support) {
-			pval->intval = fg_get_cold_thermal_level(fg);
-			if (pval->intval < fg->curr_cold_thermal_level)
-				pval->intval = fg->curr_cold_thermal_level;
-		}
-		break;
 	case POWER_SUPPLY_PROP_BATT_AGE_LEVEL:
 		pval->intval = chip->batt_age_level;
 		break;
@@ -4774,15 +4767,6 @@ static int fg_psy_set_property(struct power_supply *psy,
 			rc = fg_set_constant_chg_voltage(fg, pval->intval);
 		fg->vbatt_full_volt_uv = pval->intval;
 		break;
-	case POWER_SUPPLY_PROP_COLD_THERMAL_LEVEL:
-		if (chip->cold_thermal_support) {
-			fg->curr_cold_thermal_level = pval->intval;
-			if (fg->curr_cold_thermal_level > 3)
-				fg->curr_cold_thermal_level = 3;
-			else if (fg->curr_cold_thermal_level < 1)
-				fg->curr_cold_thermal_level = 1;
-		}
-		break;
 	case POWER_SUPPLY_PROP_CALIBRATE:
 		rc = fg_gen4_set_calibrate_level(chip, pval->intval);
 		break;
@@ -4807,7 +4791,6 @@ static int fg_property_is_writeable(struct power_supply *psy,
 	case POWER_SUPPLY_PROP_CLEAR_SOH:
 	case POWER_SUPPLY_PROP_BATT_AGE_LEVEL:
 	case POWER_SUPPLY_PROP_CONSTANT_CHARGE_VOLTAGE:
-	case POWER_SUPPLY_PROP_COLD_THERMAL_LEVEL:
 	case POWER_SUPPLY_PROP_CALIBRATE:
 		return 1;
 	default:
@@ -4853,7 +4836,6 @@ static enum power_supply_property fg_psy_props[] = {
 	POWER_SUPPLY_PROP_TIME_TO_EMPTY_AVG,
 	POWER_SUPPLY_PROP_CC_STEP,
 	POWER_SUPPLY_PROP_CC_STEP_SEL,
-	POWER_SUPPLY_PROP_COLD_THERMAL_LEVEL,
 	POWER_SUPPLY_PROP_BATT_AGE_LEVEL,
 	POWER_SUPPLY_PROP_POWER_NOW,
 	POWER_SUPPLY_PROP_POWER_AVG,
