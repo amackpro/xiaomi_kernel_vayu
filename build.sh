@@ -2,6 +2,8 @@ export PATH="$HOME/tc/proton-clang/bin:$PATH"
 SECONDS=0
 ZIPNAME="OOF-vayu-$(date '+%Y%m%d-%H%M').zip"
 
+curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -
+
 if ! [ -d "$HOME/tc/proton-clang" ]; then
     echo "Proton clang not found! Cloning..."
     if ! git clone -q --depth=1 --single-branch https://github.com/kdrag0n/proton-clang ~/tc/proton-clang; then
@@ -27,6 +29,11 @@ else
 	echo -e "\nStarting compilation...\n"
 	make -j$(nproc --all) O=out ARCH=arm64 CC=clang LD=ld.lld AR=llvm-ar NM=llvm-nm OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump STRIP=llvm-strip CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_ARM32=arm-linux-gnueabi- Image.gz-dtb dtb.img dtbo.img
 fi
+
+#remove KSU from source after compiling
+git checkout drivers/Makefile &>/dev/null
+rm -rf KernelSU
+rm -rf drivers/kernelsu
 
 if [ -f "out/arch/arm64/boot/Image.gz-dtb" ] && [ -f "out/arch/arm64/boot/dtbo.img" ]; then
 	echo -e "\nKernel compiled succesfully! Zipping up...\n"
