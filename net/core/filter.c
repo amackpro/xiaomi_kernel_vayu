@@ -3171,18 +3171,6 @@ static const struct bpf_func_proto bpf_setsockopt_proto = {
 	.arg5_type	= ARG_CONST_SIZE,
 };
 
-BPF_CALL_1(bpf_get_comm_hash_from_sk, struct sk_buff *, skb)
-{
-	return 0;
-}
-
-static const struct bpf_func_proto bpf_get_comm_hash_from_sk_proto = {
-	.func           = bpf_get_comm_hash_from_sk,
-	.gpl_only       = false,
-	.ret_type       = RET_INTEGER,
-	.arg1_type      = ARG_PTR_TO_CTX,
-};
-
 static const struct bpf_func_proto *
 bpf_base_func_proto(enum bpf_func_id func_id)
 {
